@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class ParticleController : MonoBehaviour {
 
     public Rigidbody2D rb;
-    CircleCollider2D cc;
     SpriteRenderer sr;
 
     public GameObject bond;
@@ -42,7 +41,6 @@ public class ParticleController : MonoBehaviour {
 	protected virtual void Start ()
     {
         rb = GetComponent<Rigidbody2D>();
-        cc = GetComponent<CircleCollider2D>();
         sr = GetComponent<SpriteRenderer>();
 
         bonds = new List<ParticleBond>();
