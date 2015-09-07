@@ -11,7 +11,10 @@ public class ParticleManager : MonoBehaviour {
 
     public static LayerMask layerMask;
 
+    AudioSource audioSourceFlow, audioSourceSplash;
+
     public float totalEnergy;
+    public float totalVelocitySquared, totalDeltaVelocitySquared;
     int updates = 0;
 
 	void Start()
@@ -33,22 +36,73 @@ public class ParticleManager : MonoBehaviour {
             bondsToMake = new Queue<KeyValuePair<ParticleController, ParticleController>>();
 
             layerMask = LayerMask.NameToLayer("PArticle");
+
+            AudioSource[] sources = GetComponents<AudioSource>();
+            audioSourceFlow = sources[0];
+            audioSourceSplash = sources[1];
+            Debug.Log("Particle Manager initialised with " + particles.Count + " particles");
         }
         else
         {
             Destroy(gameObject);
         }
 	}
+
+    void Update()
+    {
+        totalVelocitySquared = Mathf.Max(0.0f, totalVelocitySquared);
+        audioSourceFlow.volume = Mathf.Sqrt(totalVelocitySquared) * 0.0075f;
+        if (audioSourceFlow.volume > 0.01f)
+        {
+            if (!audioSourceFlow.isPlaying) audioSourceFlow.Play();
+        }
+        else if (audioSourceFlow.isPlaying)
+        {
+            audioSourceFlow.Stop();
+        }
+        audioSourceFlow.pitch = audioSourceFlow.pitch * 0.9f + 0.1f;
+        audioSourceFlow.panStereo *= 0.975f;
+        audioSourceFlow.panStereo = Mathf.Clamp(audioSourceFlow.panStereo, -0.8f, 0.8f);
+
+        audioSourceSplash.volume = audioSourceSplash.volume * 0.7f
+            + (Mathf.Sqrt(totalDeltaVelocitySquared) - 7.0f) * 0.03f;//10*0.2
+        //audioSourceSplash.volume = (Mathf.Sqrt(totalDeltaVelocitySquared) - 7.0f) * 0.1f;
+        if (audioSourceSplash.volume > 0.01f)
+        {
+            if (!audioSourceSplash.isPlaying) audioSourceSplash.Play();
+        }
+        else if (audioSourceSplash.isPlaying)
+        {
+            audioSourceSplash.Stop();
+        }
+        audioSourceSplash.panStereo *= 0.975f;
+        audioSourceSplash.panStereo = Mathf.Clamp(audioSourceSplash.panStereo, -0.8f, 0.8f);
+    }
 	
 	void FixedUpdate()
     {
+        totalVelocitySquared = 0.0f;
+        totalDeltaVelocitySquared = 0.0f;
         foreach (ParticleController particle in particles)
         {
             particle.EarlyFixedUpdate();
         }
+        float velocitySquared, deltaVelocitySquared;
         foreach (ParticleController particle in particles)
         {
             particle.LateFixedUpdate();//This gets funny if particles get deleted, because they get removed from the list
+            if (particle.temperature < ParticleBond.boilingTemperatures[particle.type])
+            {
+                velocitySquared = particle.rb.velocity.sqrMagnitude;
+                totalVelocitySquared += velocitySquared - 1.0f;
+                audioSourceFlow.pitch *= (particle.type == 0 ? 1.0f : 0.997f);
+                audioSourceFlow.panStereo += (particle.rb.position.x - Camera.main.transform.position.x) * 0.001f * velocitySquared;
+                //if (Mathf.Abs(particle.lastVelocitySquared - velocitySquared) > 2.0f)
+                deltaVelocitySquared = Mathf.Abs(particle.lastVelocitySquared - velocitySquared);
+                totalDeltaVelocitySquared += deltaVelocitySquared;
+                particle.lastVelocitySquared = velocitySquared;
+                audioSourceSplash.panStereo += (particle.rb.position.x - Camera.main.transform.position.x) * 0.0001f * deltaVelocitySquared;
+            }
         }
         for (int n = particles.Count - 1; n >= 0; n--)
         {
@@ -75,19 +129,11 @@ public class ParticleManager : MonoBehaviour {
                 particle.SetTemperature();//ParticleBond.[particle.type] * 1.5f;
             }
         }
-        /*else if (updates < 30)
-        {
-            updates++;
-            foreach (ParticleController particle in particles)
-            {
-                particle.thermalEnergy = 0.0f;
-            }
-        }*/
 
         totalEnergy = 0.0f;
-        foreach (GameObject go_particle in GameObject.FindGameObjectsWithTag("Particle"))
+        foreach (ParticleController particle in particles)
         {
-            totalEnergy += go_particle.GetComponent<ParticleController>().totalEnergy;
+            totalEnergy += particle.totalEnergy;
         }
 	}
 

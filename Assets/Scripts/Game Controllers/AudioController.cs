@@ -8,11 +8,14 @@ public class AudioController : MonoBehaviour {
     public float menuVolume = 0.5f, gameVolume = 0.3f;
     public float menuPitch = -0.8f, gamePitch = 1.0f, quitPitch = -0.5f;
 
-    private AudioSource[] sources;
-    public float fadeFactor = 0.02f, sfxFadeFactor = 0.2f;
+    private AudioSource audioSourceMusic, audioSourceEvaporate, audioSourceSolidify;
+    public float fadeFactor = 0.02f, sfxFadeFactor = 0.35f;
     private float stayFactor, sfxStayFactor;
 
     float targetEvaporationVolume = 0.0f;
+    float targetSolidificationVolume = 0.0f;
+
+    public int updates = 0;
 
 	void Awake()
     {
@@ -26,7 +29,10 @@ public class AudioController : MonoBehaviour {
             Debug.Log("Assigning instance of Audio Controller");
             instance = this;
             transform.SetParent(null);
-            sources = GetComponents<AudioSource>();
+            AudioSource[] sources = GetComponents<AudioSource>();
+            audioSourceMusic = sources[0];
+            audioSourceEvaporate = sources[1];
+            audioSourceSolidify = sources[2];
             stayFactor = 1 - fadeFactor;
             sfxStayFactor = 1 - sfxFadeFactor;
             DontDestroyOnLoad(this);
@@ -40,42 +46,74 @@ public class AudioController : MonoBehaviour {
 		Destroy(this);
 	}
 
+    void OnLevelWasLoaded(int level)
+    {
+        updates = 0;
+        Debug.Log("Level " + Application.loadedLevelName + " was loaded");
+    }
+
     void Update()
     {
+
         if (MenuController.inMenu)
         {
-            sources[0].volume = sources[0].volume * stayFactor + menuVolume * fadeFactor;
+            audioSourceMusic.volume = audioSourceMusic.volume * stayFactor + menuVolume * fadeFactor;
             if (!Application.loadedLevelName.Contains("Quit"))
             {
-                sources[0].pitch = sources[0].pitch * stayFactor + menuPitch * fadeFactor;
+                audioSourceMusic.pitch = audioSourceMusic.pitch * stayFactor + menuPitch * fadeFactor;
             }
             else
             {
-                sources[0].pitch = sources[0].pitch * stayFactor + quitPitch * fadeFactor;
+                audioSourceMusic.pitch = audioSourceMusic.pitch * stayFactor + quitPitch * fadeFactor;
             }
         }
         else
         {
-            sources[0].volume = sources[0].volume * stayFactor + gameVolume * fadeFactor;
-            sources[0].pitch = sources[0].pitch * stayFactor + gamePitch * fadeFactor;
+            audioSourceMusic.volume = audioSourceMusic.volume * stayFactor + gameVolume * fadeFactor;
+            audioSourceMusic.pitch = audioSourceMusic.pitch * stayFactor + gamePitch * fadeFactor;
+        }
+        audioSourceEvaporate.volume = audioSourceEvaporate.volume * sfxStayFactor + targetEvaporationVolume * sfxFadeFactor;
+        if (audioSourceEvaporate.volume < 0.01f && audioSourceEvaporate.isPlaying)
+        {
+            audioSourceEvaporate.Stop();
+        }
+        if (audioSourceEvaporate.volume > 0.01f && !audioSourceEvaporate.isPlaying)
+        {
+            audioSourceEvaporate.Play();
         }
         targetEvaporationVolume *= 0.95f;
-        sources[1].volume = sources[1].volume * sfxStayFactor + targetEvaporationVolume * sfxFadeFactor;
-        if (sources[1].volume < 0.01f)
+        audioSourceEvaporate.panStereo *= 0.975f;
+
+        audioSourceSolidify.volume = audioSourceSolidify.volume * sfxStayFactor + targetSolidificationVolume * sfxFadeFactor;
+        if (audioSourceSolidify.volume < 0.01f && audioSourceSolidify.isPlaying)
         {
-            sources[1].Stop();
+            audioSourceSolidify.Stop();
         }
-        if (sources[1].volume > 0.01f && !sources[1].isPlaying)
+        if (audioSourceSolidify.volume > 0.01f && !audioSourceSolidify.isPlaying)
         {
-            sources[1].Play();
+            audioSourceSolidify.Play();
         }
+        targetSolidificationVolume *= 0.95f;
+        audioSourceSolidify.panStereo *= 0.975f;
+
+        updates++;
     }
 
-    public static void PlayEvaporationSound()
+    public static void IncreaseEvaporationVolume(float deltaPan = 0.0f)
     {
-        if (instance != null)
+        if (instance != null && instance.updates > 30)
         {
-            instance.targetEvaporationVolume += 0.4f;
+            instance.targetEvaporationVolume += 0.3f;
+            instance.audioSourceEvaporate.panStereo += deltaPan;
+        }
+    }
+    public static void IncreaseSolidificationVolume(int type = 0, float deltaPan = 0.0f)
+    {
+        if (instance != null && instance.updates > 30)
+        {
+            instance.targetSolidificationVolume += 0.2f;
+            instance.audioSourceSolidify.pitch = instance.audioSourceSolidify.pitch * 0.8f + (1.0f + type) * 0.2f;
+            instance.audioSourceSolidify.panStereo += deltaPan;
         }
     }
 }

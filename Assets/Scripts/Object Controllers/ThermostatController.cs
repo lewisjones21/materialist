@@ -7,6 +7,10 @@ public class ThermostatController : MonoBehaviour
 
     LineRenderer lr;
     GameObject slider;
+    Rigidbody2D rb_slider;
+    AudioSource audioSource;
+
+    public float a, b, c;
 
     public float temperature = 295.0f, minTemperature = 0.0f, maxTemperature = 1200.0f;
     public HeatSource[] heatSources;
@@ -15,6 +19,8 @@ public class ThermostatController : MonoBehaviour
     {
         lr = GetComponent<LineRenderer>();
         slider = transform.FindChild("Slider").gameObject;
+        rb_slider = slider.GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
         SliderJoint2D sliderJoint = slider.GetComponent<SliderJoint2D>();
         JointTranslationLimits2D limits = new JointTranslationLimits2D();
         //Set the limits of the slider joint based on the maximum and minimum allowed temperatures
@@ -80,6 +86,14 @@ public class ThermostatController : MonoBehaviour
         {
             Destroy(transform.FindChild("Ceramic Marker").gameObject);//.SetActive(false);
         }
+
+        a = 4.0f / (minTemperature * maxTemperature - Mathf.Pow(minTemperature + maxTemperature, 2.0f));
+        b = -a * (minTemperature + maxTemperature);
+        c = a * minTemperature * maxTemperature;
+        Debug.Log(a * minTemperature * minTemperature + b * minTemperature + c);
+        Debug.Log(a * maxTemperature * maxTemperature + b * maxTemperature + c);
+        float midTemperature = (minTemperature + maxTemperature) * 0.5f;
+        Debug.Log(a * midTemperature * midTemperature + b * midTemperature + c);
     }
 
     void Update()
@@ -92,6 +106,17 @@ public class ThermostatController : MonoBehaviour
             {
                 heatSource.SetTemperature(temperature);
             }
+        }
+        float velocitySquared = rb_slider.velocity.sqrMagnitude;
+        if (velocitySquared > 0.01f)
+        {
+            if (!audioSource.isPlaying) audioSource.Play();
+            audioSource.volume = velocitySquared * 0.1f * (a * temperature * temperature + b * temperature + c);
+            audioSource.pitch = 3.0f * ThermometerController.GetRelativeTemperature(temperature);
+        }
+        else
+        {
+            if (audioSource.isPlaying) audioSource.Stop();
         }
     }
 

@@ -25,10 +25,13 @@ public class ParticleController : MonoBehaviour {
     public float kineticEnergy;
     public float gravitationalEnergy;
     public float totalEnergy;
-    public Vector2 nextVelocity;
-    public float nextThermalEnergy;
+    Vector2 nextVelocity;
+    float nextThermalEnergy;
+
+    public float lastVelocitySquared;
 
     public bool boiled = false;
+    public bool solidified = false;
 
     public float startTemperature = 295.0f;
 
@@ -73,13 +76,40 @@ public class ParticleController : MonoBehaviour {
         {
             sr.color = Color.Lerp(sr.color, colourSelected, 0.5f);
         }
+
+        if (temperature > ParticleBond.boilingTemperatures[type] - 5.0f)
+        {
+            rb.gravityScale
+                = 1.0f - Mathf.Min(1.5f, Mathf.Max(0.0f, (temperature - ParticleBond.boilingTemperatures[type] + 5.0f) * 0.2f));
+        }
+        else
+        {
+            rb.gravityScale = 1.0f;
+            boiled = false;
+        }
+        if (temperature > ParticleBond.boilingTemperatures[type] + 5.0f && boiled == false)
+        {
+            boiled = true;
+            AudioController.IncreaseEvaporationVolume((rb.position.x - Camera.main.transform.position.x) * 0.1f);
+        }
+
+        if (temperature > ParticleBond.meltingTemperatures[type] + 5.0f)
+        {
+            solidified = false;
+        }
+        if (temperature < ParticleBond.meltingTemperatures[type] - 5.0f && solidified == false)
+        {
+            solidified = true;
+            AudioController.IncreaseSolidificationVolume(type, (rb.position.x - Camera.main.transform.position.x) * 0.1f);
+        }
     }
 
     public virtual void EarlyFixedUpdate()
     {
+        //lastVelocitySquared = rb.velocity.sqrMagnitude;//This is updated by the ParticleManager
         pressure *= 0.1f * (1 + Mathf.Min(3.0f, Mathf.Max(0.0f, (temperature - ParticleBond.boilingTemperatures[type] + 5.0f) * 0.1f)));
         //pressure *= 0.1f;//0.1f works
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(rb.position, radius * 2.5f, ParticleManager.layerMask);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(rb.position, radius * 2.5f);//, ParticleManager.layerMask);
         if (colliders != null)
         {
             Vector2 displacement;//, velocityDifference;
@@ -144,21 +174,6 @@ public class ParticleController : MonoBehaviour {
             Debug.Log(name + "'s thermalEnergy is negative");
             Debug.Break();
         }*/
-        if (temperature > ParticleBond.boilingTemperatures[type] - 5.0f)
-        {
-            rb.gravityScale
-                = 1.0f - Mathf.Min(1.5f, Mathf.Max(0.0f, (temperature - ParticleBond.boilingTemperatures[type] + 5.0f) * 0.2f));
-        }
-        else
-        {
-            rb.gravityScale = 1.0f;
-            boiled = false;
-        }
-        if (temperature > ParticleBond.boilingTemperatures[type] + 5.0f)
-        {
-            boiled = true;
-            AudioController.PlayEvaporationSound();
-        }
     }
 
     void OnCollisionEnter2D(Collision2D collision)
