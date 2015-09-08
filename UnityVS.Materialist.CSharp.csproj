@@ -76,7 +76,7 @@
     <Compile Include="Assets\Scripts\Game Controllers\LevelController.cs" />
     <Compile Include="Assets\Scripts\Game Controllers\LevelObjective.cs" />
     <Compile Include="Assets\Scripts\Game Controllers\MenuController.cs" />
-    <Compile Include="Assets\Scripts\Particle Controllers\ParticleBondManager.cs" />
+    <Compile Include="Assets\Scripts\Game Controllers\ParticleBondManager.cs" />
     <Compile Include="Assets\Scripts\Game Controllers\ParticleHandler.cs" />
     <Compile Include="Assets\Scripts\Game Controllers\ParticleManager.cs" />
     <Compile Include="Assets\Scripts\Object Controllers\BatteryController.cs" />

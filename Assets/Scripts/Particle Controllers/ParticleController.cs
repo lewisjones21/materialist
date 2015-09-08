@@ -54,6 +54,8 @@ public class ParticleController : MonoBehaviour {
 
         radius = transform.lossyScale.x * 0.5f;
         radiusSquared = radius * radius;
+
+        Add();//Inform the ParticleManager of this particles's existence
 	}
 
     void Update()
@@ -263,17 +265,19 @@ public class ParticleController : MonoBehaviour {
         }
     }
 
-    public void SetTemperature(float newTemperature = -1.0f)
+    public void SetTemperature(float newTemperature = -1.0f, bool setStartTemperature = false)
     {
         if (newTemperature == -1.0f)
         {
-            thermalEnergy = startTemperature * massxHeatCapacity;
+            temperature = startTemperature;
         }
         else
         {
-            thermalEnergy = newTemperature * massxHeatCapacity;
+            temperature = newTemperature;
         }
+        thermalEnergy = temperature * massxHeatCapacity;
         nextThermalEnergy = thermalEnergy;
+        if (setStartTemperature) startTemperature = newTemperature;
     }
 
     public bool SetVelocity(Vector2 velocity)

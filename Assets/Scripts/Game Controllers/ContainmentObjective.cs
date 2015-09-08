@@ -26,11 +26,8 @@ public class ContainmentObjective : LevelObjective {
     {
         GameObject[] go_particles = GameObject.FindGameObjectsWithTag("Particle");
         currentCount = 0;
-        ParticleController particle;
-        foreach (GameObject go_particle in go_particles)
+        foreach (ParticleController particle in ParticleManager.particles)
         {
-            particle = go_particle.GetComponent<ParticleController>();
-
             if (type >= 0 && particle.type != type) continue;
             if (particle.rb.position.x < bottomLeft.x || particle.rb.position.x > topRight.x
                 || particle.rb.position.y < bottomLeft.y || particle.rb.position.y > topRight.y) continue;

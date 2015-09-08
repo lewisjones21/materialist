@@ -28,6 +28,7 @@ public class LaserController : MonoBehaviour {
         //pivot = transform.FindChild("Pivot");
         audioSource = GetComponent<AudioSource>();
         dragable = GetComponent<Dragable>();
+        lr_aim.SetPosition(0, transform.position);
         lr_aim.sortingLayerName = "Laser";
         lr_aim.sortingOrder = 0;
         lr_beam.sortingLayerName = "Laser";

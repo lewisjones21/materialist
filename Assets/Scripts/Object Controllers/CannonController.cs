@@ -27,6 +27,7 @@ public class CannonController : MonoBehaviour {
         //pivot = transform.FindChild("Pivot");
         audioSource = GetComponent<AudioSource>();
         dragable = GetComponent<Dragable>();
+        lr_aim.SetPosition(0, transform.position);
         lr_aim.sortingLayerName = "Cannon";
         lr_aim.sortingOrder = 0;
         //ps.enableEmission = false;
@@ -63,7 +64,7 @@ public class CannonController : MonoBehaviour {
             Destroy(transform.FindChild("Max Block Container").gameObject);
         }
 
-        timeOutPeriod = 1.0f / speed;//Enough time for the previous particle to get clear
+        timeOutPeriod = 0.5f / speed;//Enough time for the previous particle to get clear
 	}
 	
 	void Update()
@@ -108,14 +109,13 @@ public class CannonController : MonoBehaviour {
         if (currentTimeOut == 0.0f && Physics2D.OverlapCircle(position, 1.5f, ParticleManager.layerMask) == null)
         {
             GameObject newParticle = (GameObject)Instantiate(particle, position, Quaternion.identity);
-            Debug.Log(newParticle.transform.position);
             //currentParticle = newParticle.GetComponent<ParticleController>();
             Vector2 velocity = speed * transform.right;
             Rigidbody2D rb_particle = newParticle.GetComponent<Rigidbody2D>();
             rb_particle.velocity = velocity;
             ParticleController particleController = newParticle.GetComponent<ParticleController>();
-            particleController.Add();
-            particleController.SetTemperature(temperature);
+            //particleController.Add();
+            particleController.SetTemperature(temperature, true);
             //Set energy-related variables so that the temperature doesn't get reduced when attempting to conserve energy
             particleController.lastVelocitySquared = Vector2.Dot(velocity, velocity);
             particleController.kineticEnergy = 0.5f * rb_particle.mass * particleController.lastVelocitySquared;
