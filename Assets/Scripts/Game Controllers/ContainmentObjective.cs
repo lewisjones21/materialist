@@ -3,8 +3,8 @@ using System.Collections;
 
 public class ContainmentObjective : LevelObjective {
 
-    public Vector2 bottomLeft, topRight;
-    public int type = -1, countRequired = 12, currentCount = 0;
+    public Vector2 topRight, bottomLeft;
+    public int type = -1, countRequired = 12, currentCount = 0, completionRelief = 4;
     public float minTemperature = -1.0f, maxTemperature = -1.0f;
 
 	protected override void Start()
@@ -38,7 +38,7 @@ public class ContainmentObjective : LevelObjective {
             if (maxTemperature > 0.0f && particle.temperature > maxTemperature) continue;
             currentCount++;
         }
-        isComplete = (currentCount >= countRequired - (isComplete ? 4 : 0));
+        isComplete = (currentCount >= countRequired - (isComplete ? completionRelief : 0));
         return base.GetIsComplete();
     }
 }

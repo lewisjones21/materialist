@@ -56,11 +56,14 @@ public class ParticleBond : MonoBehaviour {
             && a.thermalEnergy > aBondEnergy && b.thermalEnergy > bBondEnergy
             && totalThermalEnergy > bondReleaseEnergy)
             //&& joint.GetReactionForce(Time.deltaTime).sqrMagnitude > maxForceSquared)*/
-        if (a.temperature > meltingTemperatures[typeA] + 5.0f && b.temperature > meltingTemperatures[typeB] + 5.0f
-            || Random.value < 0.0000001 * (joint.GetReactionForce(Time.deltaTime).sqrMagnitude - 100000.0f))
-            //* (a.temperature - meltingTemperatures[typeA] + b.temperature - meltingTemperatures[typeB] + 10.0f))
+        if (joint != null)
         {
-            Remove();
+            if (a.temperature > meltingTemperatures[typeA] + 5.0f && b.temperature > meltingTemperatures[typeB] + 5.0f
+                || Random.value < 0.0000001 * (joint.GetReactionForce(Time.deltaTime).sqrMagnitude - 100000.0f))
+            //* (a.temperature - meltingTemperatures[typeA] + b.temperature - meltingTemperatures[typeB] + 10.0f))
+            {
+                Delete();
+            }
         }
     }
 
@@ -88,7 +91,7 @@ public class ParticleBond : MonoBehaviour {
         joint.enableCollision = true;
     }
 
-    public void Remove()
+    public void Delete()
     {
         Destroy(joint);
         a.bonds.Remove(this);

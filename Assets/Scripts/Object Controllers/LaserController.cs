@@ -4,9 +4,11 @@ using System.Collections;
 public class LaserController : MonoBehaviour {
 
     Rigidbody2D rb;
-    LineRenderer lr;
+    LineRenderer lr_aim, lr_beam;
+    ParticleSystem ps;
     //Transform pivot;
     AudioSource audioSource;
+    Dragable dragable;
 
     public BatteryController battery;
 
@@ -20,17 +22,49 @@ public class LaserController : MonoBehaviour {
 	void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        lr = transform.FindChild("Beam").GetComponent<LineRenderer>();
+        lr_aim = transform.FindChild("Handle").GetComponent<LineRenderer>();
+        lr_beam = transform.FindChild("Beam").GetComponent<LineRenderer>();
+        ps = lr_beam.transform.FindChild("End Effect").GetComponent<ParticleSystem>();
         //pivot = transform.FindChild("Pivot");
         audioSource = GetComponent<AudioSource>();
-        lr.sortingLayerName = "Laser";
-        lr.sortingOrder = 0;
+        dragable = GetComponent<Dragable>();
+        lr_aim.sortingLayerName = "Laser";
+        lr_aim.sortingOrder = 0;
+        lr_beam.sortingLayerName = "Laser";
+        lr_beam.sortingOrder = 0;
+        ps.enableEmission = false;
+
         HingeJoint2D hinge = GetComponent<HingeJoint2D>();
         hinge.connectedAnchor = transform.TransformPoint(GetComponent<HingeJoint2D>().anchor);
-        JointAngleLimits2D newLimits = new JointAngleLimits2D();
-        newLimits.min = minAngle;
-        newLimits.max = maxAngle;
-        hinge.limits = newLimits;
+        if (maxAngle - minAngle < 360.0f)
+        {
+            JointAngleLimits2D newLimits = new JointAngleLimits2D();
+            newLimits.min = minAngle;
+            newLimits.max = maxAngle;
+            hinge.limits = newLimits;
+        }
+        else
+        {
+            hinge.useLimits = false;
+        }
+        if (maxAngle - minAngle <= 120.0f)//If they wouldn't look untangible
+        {
+            //Rotate the blocks and unparent them to prevent further rotation
+            Transform blockContainer = transform.FindChild("Min Block Container");
+            blockContainer.localRotation = Quaternion.AngleAxis(-minAngle, Vector3.forward);
+            blockContainer.GetChild(0).SetParent(transform.parent);
+            Destroy(blockContainer.gameObject);
+            blockContainer = transform.FindChild("Max Block Container");
+            blockContainer.localRotation = Quaternion.AngleAxis(-maxAngle, Vector3.forward);
+            blockContainer.GetChild(0).SetParent(transform.parent);
+            Destroy(blockContainer.gameObject);
+        }
+        else
+        {
+            //Destroy the blocks
+            Destroy(transform.FindChild("Min Block Container").gameObject);
+            Destroy(transform.FindChild("Max Block Container").gameObject);
+        }
 
         if (battery != null) battery.SetTarget(transform.position);
 
@@ -48,35 +82,47 @@ public class LaserController : MonoBehaviour {
 
         float relativePower = power / maxPower;
         //pivot.rotation = Quaternion.identity;
-        lr.SetPosition(0, rb.position);
+        lr_beam.SetPosition(0, rb.position);
         if (relativePower > 0.01f)
         {
-            RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * 2.75f, transform.right, 100.0f);
-            /*RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + transform.forward * 5.0f, transform.forward, 100.0f);
-            float distanceSquared;
-            RaycastHit2D closestHit;
-            foreach (RaycastHit2D hit in hits)
-            {
-                if ()
-            }*/
-            Debug.Log(hit.point);
-            Debug.Log(hit.collider.tag);
+            lr_aim.enabled = false;
+            RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * 2.75f, transform.right, 500.0f);
             if (hit.point != null)
             {
                 hitPoint = hit.point;
-                lr.SetPosition(1, hitPoint);//Vector3.right * 10.0f);//
+                lr_beam.SetPosition(1, hitPoint);
                 hitParticle = hit.collider.GetComponent<ParticleController>();
                 if (hitParticle != null)
                 {
                     hitParticle.thermalEnergy += power * Time.deltaTime;
                 }
+                ps.transform.position = hitPoint;
+                //ps.transform.rotation = Quaternion.LookRotation(hit.normal);
+                ps.enableEmission = true;
+                ps.emissionRate = 100.0f * relativePower * relativePower;
             }
         }
         else
         {
-            lr.SetPosition(1, rb.position);
+            lr_beam.SetPosition(1, rb.position);
+            ps.enableEmission = false;
+            if (dragable.held)
+            {
+                //Position aiming line
+                RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * 2.75f, transform.right, 500.0f);
+                if (hit.point != null)
+                {
+                    hitPoint = hit.point;
+                    lr_aim.SetPosition(1, hitPoint);
+                }
+                lr_aim.enabled = true;
+            }
+            else
+            {
+                lr_aim.enabled = false;
+            }
         }
-        lr.SetWidth(0.15f * relativePower, 0.15f * relativePower);
+        lr_beam.SetWidth(0.15f * relativePower, 0.15f * relativePower);
         audioSource.pitch = relativePower;
         audioSource.volume = 0.2f * relativePower;
         if (audioSource.volume > 0.01f && !audioSource.isPlaying) audioSource.Play();

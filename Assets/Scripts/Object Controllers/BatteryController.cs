@@ -16,6 +16,7 @@ public class BatteryController : MonoBehaviour {
         lr = GetComponent<LineRenderer>();
         energyMeter = transform.FindChild("Energy Meter");
         lr.SetPosition(0, transform.position);
+        lr.SetPosition(1, transform.position);
         lr.sortingLayerName = "Battery";
         lr.sortingOrder = 0;
 
@@ -29,6 +30,8 @@ public class BatteryController : MonoBehaviour {
             lr.SetPosition(1, targetPosition);
             targetSet = true;
         }
+
+        if (energy < 0.0f) energy = 0.0f;
 
         float value = 2.0f * energy / maxEnergy;
 	    energyMeter.localScale = new Vector3(energyMeter.localScale.x, value, 1.0f);

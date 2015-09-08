@@ -38,7 +38,7 @@ public class ThermostatController : MonoBehaviour
 
         sliderJoint.connectedAnchor = slider.transform.position;
 
-        if (heatSources != null)
+        if (heatSources.Length > 0)
         {
             lr.SetPosition(1, heatSources[0].transform.position);
         }

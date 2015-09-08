@@ -11,6 +11,8 @@ public class Dragable : MonoBehaviour {
 
     public bool fixOnRelease = false;
 
+    public bool held = false;
+
 	void Start()
     {
         lr = GetComponent<LineRenderer>();
@@ -45,6 +47,7 @@ public class Dragable : MonoBehaviour {
         lr.enabled = true;
         rb.isKinematic = false;
         CursorManager.SetHasGrabbed(true);
+        held = true;
     }
     void OnMouseUp()
     {
@@ -53,6 +56,7 @@ public class Dragable : MonoBehaviour {
         lr.enabled = false;
         rb.isKinematic = fixOnRelease;
         CursorManager.SetHasGrabbed(false);
+        held = false;
     }
 
     void OnMouseEnter()

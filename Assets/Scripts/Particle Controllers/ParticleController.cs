@@ -36,7 +36,7 @@ public class ParticleController : MonoBehaviour {
 
     public float radius, radiusSquared;
     public Vector2 selectionOffset;
-    public bool selected;
+    public bool selected, shouldDelete = false;
 
 	protected virtual void Start ()
     {
@@ -107,7 +107,7 @@ public class ParticleController : MonoBehaviour {
         //lastVelocitySquared = rb.velocity.sqrMagnitude;//This is updated by the ParticleManager
         pressure *= 0.1f * (1 + Mathf.Min(3.0f, Mathf.Max(0.0f, (temperature - ParticleBond.boilingTemperatures[type] + 5.0f) * 0.1f)));
         //pressure *= 0.1f;//0.1f works
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(rb.position, radius * 2.5f);//, ParticleManager.layerMask);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(rb.position, radius * 2.5f, ParticleManager.layerMask);
         if (colliders != null)
         {
             Vector2 displacement;//, velocityDifference;
@@ -121,7 +121,7 @@ public class ParticleController : MonoBehaviour {
                     distanceSquared = displacement.sqrMagnitude;
                     inverseDistanceSquared = 1.0f / distanceSquared;
                     //The following line goes weird if the temperature goes negative
-                    //(clearly that shouldn't happen (but does because of breaking bonds))
+                    //(clearly that shouldn't happen (but does because of breaking bonds, velocity changes, etc.))
                     pressure += Mathf.Max(0.0f, inverseDistanceSquared * other.rb.mass
                         * Mathf.Min(temperature + 25.0f - ParticleBond.meltingTemperatures[type], 100.0f) * 0.01f);//0.05f);//* 5.0f;
                     TransferProperties(other, inverseDistanceSquared);
@@ -129,6 +129,11 @@ public class ParticleController : MonoBehaviour {
                     if (distanceSquared < radiusSquared * 4.5f)
                     {
                         Connect(other);
+                    }
+                    if (distanceSquared < radiusSquared * 0.9f)
+                    {
+                        //shouldDelete = true;
+                        DisconnectAll();
                     }
                 }
             }
@@ -225,15 +230,16 @@ public class ParticleController : MonoBehaviour {
 
     public void Connect(ParticleController other)
     {
+        if (bonds.Count >= ParticleController.maxBonds || other.bonds.Count >= ParticleController.maxBonds) return;
         if (other.GetType() != this.GetType()) return;
         foreach (ParticleBond bond in bonds)
         {
             if (bond.BondsParticle(other)) return;
         }
         //Debug.Log(other);
-        if (bonds.Count < ParticleController.maxBonds && other.bonds.Count < ParticleController.maxBonds
+        
             //&& thermalEnergy > ParticleController.bondEnergy && other.thermalEnergy > ParticleController.bondEnergy
-            && temperature < ParticleBond.meltingTemperatures[type] - 5.0f
+            if (temperature < ParticleBond.meltingTemperatures[type] - 5.0f
             && other.temperature < ParticleBond.meltingTemperatures[other.type] - 5.0f)
             //+ other.thermalEnergy < ParticleBond.bondReleaseEnergies[type, other.type])
         {
@@ -245,7 +251,7 @@ public class ParticleController : MonoBehaviour {
     {
         if (bonds.Contains(bond))
         {
-            bond.Remove();
+            bond.Delete();
         }
     }
 
@@ -253,7 +259,7 @@ public class ParticleController : MonoBehaviour {
     {
         for (int n = bonds.Count - 1; n >= 0; n--)
         {
-            bonds[n].Remove();
+            bonds[n].Delete();
         }
     }
 
@@ -266,6 +272,22 @@ public class ParticleController : MonoBehaviour {
         else
         {
             thermalEnergy = newTemperature * massxHeatCapacity;
+        }
+        nextThermalEnergy = thermalEnergy;
+    }
+
+    public bool SetVelocity(Vector2 velocity)
+    {
+        if (rb != null)
+        {
+            rb.velocity = velocity;
+            lastVelocitySquared = Vector2.Dot(velocity, velocity);
+            kineticEnergy = 0.5f * rb.mass * lastVelocitySquared;
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -283,6 +305,12 @@ public class ParticleController : MonoBehaviour {
         }*/
     }
 
+    public void Add()//Must be called to notify relevant managers of instantiation
+    {
+        ParticleManager.particles.Add(this);
+        //ParticleHandler.DeleteSelection(this);
+        //Destroy(gameObject);
+    }
     public void Delete()
     {
         DisconnectAll();

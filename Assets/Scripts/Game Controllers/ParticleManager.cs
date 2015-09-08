@@ -35,7 +35,7 @@ public class ParticleManager : MonoBehaviour {
             }
             bondsToMake = new Queue<KeyValuePair<ParticleController, ParticleController>>();
 
-            layerMask = LayerMask.NameToLayer("PArticle");
+            layerMask = LayerMask.GetMask("Particle");
 
             AudioSource[] sources = GetComponents<AudioSource>();
             audioSourceFlow = sources[0];
@@ -106,7 +106,7 @@ public class ParticleManager : MonoBehaviour {
         }
         for (int n = particles.Count - 1; n >= 0; n--)
         {
-            if (particles[n].temperature > 3000.0f || particles[n].transform.position.sqrMagnitude > 2500.0f)
+            if (particles[n].temperature > 3000.0f || particles[n].transform.position.sqrMagnitude > 2500.0f || particles[n].shouldDelete)
             {
                 particles[n].Delete();
             }

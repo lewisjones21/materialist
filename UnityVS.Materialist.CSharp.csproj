@@ -7,14 +7,16 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{95ECE21B-B74B-6015-3CB4-476408E5BAD1}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <AssemblyName>Assembly-CSharp</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneOSXIntel:4</UnityBuildTarget>
     <UnityVersion>5.1.0f3</UnityVersion>
@@ -66,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Game Controllers\AudioController.cs" />
+    <Compile Include="Assets\Scripts\Game Controllers\CameraScaler.cs" />
     <Compile Include="Assets\Scripts\Game Controllers\ConnectionObjective.cs" />
     <Compile Include="Assets\Scripts\Game Controllers\ContainmentObjective.cs" />
     <Compile Include="Assets\Scripts\Game Controllers\CursorManager.cs" />
@@ -73,7 +76,7 @@
     <Compile Include="Assets\Scripts\Game Controllers\LevelController.cs" />
     <Compile Include="Assets\Scripts\Game Controllers\LevelObjective.cs" />
     <Compile Include="Assets\Scripts\Game Controllers\MenuController.cs" />
-    <Compile Include="Assets\Scripts\Game Controllers\ParticleBondManager.cs" />
+    <Compile Include="Assets\Scripts\Particle Controllers\ParticleBondManager.cs" />
     <Compile Include="Assets\Scripts\Game Controllers\ParticleHandler.cs" />
     <Compile Include="Assets\Scripts\Game Controllers\ParticleManager.cs" />
     <Compile Include="Assets\Scripts\Object Controllers\BatteryController.cs" />
@@ -81,7 +84,9 @@
     <Compile Include="Assets\Scripts\Object Controllers\Dragable.cs" />
     <Compile Include="Assets\Scripts\Object Controllers\ElectrodeController.cs" />
     <Compile Include="Assets\Scripts\Object Controllers\HeatSource.cs" />
+    <Compile Include="Assets\Scripts\Object Controllers\CannonController.cs" />
     <Compile Include="Assets\Scripts\Object Controllers\LaserController.cs" />
+    <Compile Include="Assets\Scripts\Object Controllers\CannonSwitchController.cs" />
     <Compile Include="Assets\Scripts\Object Controllers\LaserSwitchController.cs" />
     <Compile Include="Assets\Scripts\Object Controllers\StartTemperatureController.cs" />
     <Compile Include="Assets\Scripts\Object Controllers\StirrerController.cs" />

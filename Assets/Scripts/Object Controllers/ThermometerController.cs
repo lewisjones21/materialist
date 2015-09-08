@@ -26,7 +26,28 @@ public class ThermometerController : MonoBehaviour {
         lrChild.sortingLayerName = "Door";
         lrChild.sortingOrder = 1;
 
-        if (GameObject.FindObjectOfType<WaterParticleController>() != null)
+        bool hasWater = (GameObject.FindObjectOfType<WaterParticleController>() != null);
+        bool hasMetal = (GameObject.FindObjectOfType<MetalParticleController>() != null);
+        bool hasCeramic = (GameObject.FindObjectOfType<CeramicParticleController>() != null);
+
+        CannonController[] cannons = GameObject.FindObjectsOfType<CannonController>();
+        foreach (CannonController cannon in cannons)
+        {
+            switch (cannon.particleType)
+            {
+                case (0):
+                    hasWater = true;
+                    break;
+                case (1):
+                    hasMetal = true;
+                    break;
+                case (2):
+                    hasCeramic = true;
+                    break;
+            }
+        }
+
+        if (hasWater)
         {
             transform.FindChild("Water Marker").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
                 GetRelativeTemperature(ParticleBond.meltingTemperatures[0]));
@@ -38,7 +59,7 @@ public class ThermometerController : MonoBehaviour {
             transform.FindChild("Water Marker").gameObject.SetActive(false);
             transform.FindChild("Water Marker 2").gameObject.SetActive(false);
         }
-        if (GameObject.FindObjectOfType<MetalParticleController>() != null)
+        if (hasMetal)
         {
             transform.FindChild("Metal Marker").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
                 GetRelativeTemperature(ParticleBond.meltingTemperatures[1]));
@@ -50,7 +71,7 @@ public class ThermometerController : MonoBehaviour {
             transform.FindChild("Metal Marker").gameObject.SetActive(false);
             transform.FindChild("Metal Marker 2").gameObject.SetActive(false);
         }
-        if (GameObject.FindObjectOfType<CeramicParticleController>() != null)
+        if (hasCeramic)
         {
             transform.FindChild("Ceramic Marker").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
                 GetRelativeTemperature(ParticleBond.meltingTemperatures[2]));
@@ -86,6 +107,11 @@ public class ThermometerController : MonoBehaviour {
                 if (collider.tag == "HeatSource")
                 {
                     temperature = collider.GetComponent<HeatSource>().temperature;
+                    return;
+                }
+                if (collider.tag == "Cannon")
+                {
+                    temperature = collider.GetComponent<CannonController>().temperature;
                     return;
                 }
                 if (collider.tag == "Particle")
