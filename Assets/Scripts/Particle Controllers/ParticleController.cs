@@ -11,13 +11,18 @@ public class ParticleController : MonoBehaviour {
     public Color colourCold, colourSet, colourMelt, colourHot, colourSelected;
 
     //public List<ParticleController> connectedParticles = new ParticleController[4];
-    public int type = 0;
+    public virtual int type { get { return -1; } }
     public List<ParticleBond> bonds;
     public static int maxBonds = 6;
-    public static float thermalTransferFactor = 0.6f, velocityTransferFactor = 0.1f,//h x A, mu
-        thermalStayFactor, velocityStayFactor;
-    public static float heatCapacity = 5.0f;//c
-    public static float mass = 1.0f, inverseMass, massxHeatCapacity, inverseMassxHeatCapacity;
+    public virtual float thermalTransferFactor { get { return 0.6f; } }
+    public virtual float velocityTransferFactor { get { return 0.1f; } }
+    public virtual float thermalStayFactor { get { return 0.4f; } }
+    public virtual float velocityStayFactor { get { return 0.9f; } }
+    public virtual float heatCapacity { get { return 5.0f; } }
+    public virtual float mass { get { return 1.0f; } }
+    public virtual float inverseMass { get { return 1.0f; } }
+    public virtual float massxHeatCapacity { get { return 5.0f; } }
+    public virtual float inverseMassxHeatCapacity { get { return 0.2f; } }
 
     public float pressure, temperature;
     public float thermalEnergy;
@@ -34,26 +39,19 @@ public class ParticleController : MonoBehaviour {
 
     public float startTemperature = 295.0f;
 
-    public float radius, radiusSquared;
+    public virtual float radius { get { return 0.5f; } }
+    public virtual float radiusSquared { get { return 0.25f; } }
     public Vector2 selectionOffset;
     public bool selected, shouldDelete = false;
 
-	protected virtual void Start ()
+	protected virtual void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
 
         bonds = new List<ParticleBond>();
 
-        thermalStayFactor = 1.0f - thermalTransferFactor;
-        velocityStayFactor = 1.0f - velocityTransferFactor;
-
-        inverseMass = 1 / rb.mass;
-        massxHeatCapacity = rb.mass * heatCapacity;
-        inverseMassxHeatCapacity = 1 / massxHeatCapacity;
-
-        radius = transform.lossyScale.x * 0.5f;
-        radiusSquared = radius * radius;
+        temperature = startTemperature;
 
         Add();//Inform the ParticleManager of this particles's existence
 	}
@@ -109,7 +107,7 @@ public class ParticleController : MonoBehaviour {
         //lastVelocitySquared = rb.velocity.sqrMagnitude;//This is updated by the ParticleManager
         pressure *= 0.1f * (1 + Mathf.Min(3.0f, Mathf.Max(0.0f, (temperature - ParticleBond.boilingTemperatures[type] + 5.0f) * 0.1f)));
         //pressure *= 0.1f;//0.1f works
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(rb.position, radius * 2.5f, ParticleManager.layerMask);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(rb.position, radius * 2.5f);//, ParticleManager.layerMask);
         if (colliders != null)
         {
             Vector2 displacement;//, velocityDifference;
@@ -159,13 +157,15 @@ public class ParticleController : MonoBehaviour {
         thermalEnergy = thermalEnergy * thermalStayFactor + nextThermalEnergy * thermalTransferFactor;
 
         //Update thermal energy to ensure overal conservation of energy
-        float deltaKineticEnergy = 0.5f * rb.mass * rb.velocity.sqrMagnitude - kineticEnergy;
-        kineticEnergy += deltaKineticEnergy;
-        float deltaGravitationalEnergy = -rb.mass * Vector2.Dot(Physics2D.gravity, rb.position) * rb.gravityScale - gravitationalEnergy;
-        gravitationalEnergy += deltaGravitationalEnergy;
+        float deltaKineticEnergy = 0.5f * mass * rb.velocity.sqrMagnitude - kineticEnergy;
+        kineticEnergy = 0.5f * mass * rb.velocity.sqrMagnitude;
+        gravitationalEnergy = -mass * Vector2.Dot(Physics2D.gravity, rb.position) * rb.gravityScale;
+        /*kineticEnergy += deltaKineticEnergy;
+        float deltaGravitationalEnergy = -mass * Vector2.Dot(Physics2D.gravity, rb.position) * rb.gravityScale - gravitationalEnergy;
+        gravitationalEnergy += deltaGravitationalEnergy;*/
         if (!selected)
         {
-            thermalEnergy -= deltaKineticEnergy + deltaGravitationalEnergy;
+            thermalEnergy -= deltaKineticEnergy;
         }
         thermalEnergy = Mathf.Max(thermalEnergy, 0.0f);
         temperature = thermalEnergy * inverseMassxHeatCapacity;
@@ -186,25 +186,46 @@ public class ParticleController : MonoBehaviour {
         if (collision.collider.tag == "Particle")
         {
             ParticleController other = collision.collider.GetComponent<ParticleController>();
-            //Update thermal energy to ensure overal conservation of energy
-            float myDeltaKineticEnergy = 0.5f * rb.mass * rb.velocity.sqrMagnitude - kineticEnergy;
-            float otherDeltaKineticEnergy = 0.5f * other.rb.mass * other.rb.velocity.sqrMagnitude - other.kineticEnergy;
+            //Update thermal energy to ensure overall conservation of energy
+            float myDeltaKineticEnergy = 0.5f * mass * rb.velocity.sqrMagnitude - kineticEnergy;
+            float otherDeltaKineticEnergy = 0.5f * other.mass * other.rb.velocity.sqrMagnitude - other.kineticEnergy;
             float deltaThermalEnergy = -(myDeltaKineticEnergy + otherDeltaKineticEnergy) * 0.5f;
-            thermalEnergy += deltaThermalEnergy;
-            other.thermalEnergy += deltaThermalEnergy;
+            thermalEnergy += deltaThermalEnergy;// * impactFudgeFactor;
+            other.thermalEnergy += deltaThermalEnergy;// *impactFudgeFactor;
             kineticEnergy += myDeltaKineticEnergy;
             other.kineticEnergy += otherDeltaKineticEnergy;
-
         }
+        /*else
+        {
+            //Update thermal energy to ensure overall conservation of energy
+            float myDeltaKineticEnergy = 0.5f * mass * rb.velocity.sqrMagnitude - kineticEnergy;
+            thermalEnergy -= myDeltaKineticEnergy;
+        }*/
     }
 
     void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.collider.tag != "Particle")
         {
-            rb.AddForce(collision.contacts[0].normal * Mathf.Abs(pressure) * 25.0f);
+            rb.AddForce(collision.contacts[0].normal * Mathf.Abs(pressure) * mass * 25.0f, ForceMode2D.Force);
         }
     }
+
+    /*void OnDrawGizmos()
+    {
+        //GUI.TextArea(new Rect(rb.position - Vector2.one * 0.5f, Vector2.one), temperature.ToString());
+        drawString(temperature.ToString(), transform.position);
+    }
+    static void drawString(string text, Vector3 worldPos, Color? colour = null)
+    {
+        UnityEditor.Handles.BeginGUI();
+        if (colour.HasValue) GUI.color = colour.Value;
+        var view = UnityEditor.SceneView.currentDrawingSceneView;
+        Vector3 screenPos = view.camera.WorldToScreenPoint(worldPos);
+        Vector2 size = GUI.skin.label.CalcSize(new GUIContent(text));
+        GUI.Label(new Rect(screenPos.x - (size.x / 2), -screenPos.y + view.position.height + 4, size.x, size.y), text);
+        UnityEditor.Handles.EndGUI();
+    }*/
 
     protected virtual void TransferProperties(ParticleController other, float inverseDistanceSquared)
     {
@@ -311,9 +332,8 @@ public class ParticleController : MonoBehaviour {
 
     public void Add()//Must be called to notify relevant managers of instantiation
     {
-        ParticleManager.particles.Add(this);
-        //ParticleHandler.DeleteSelection(this);
-        //Destroy(gameObject);
+        ParticleManager.AddParticle(this);
+        //ParticleHandler.AddSelection(this);
     }
     public void Delete()
     {

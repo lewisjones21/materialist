@@ -46,10 +46,10 @@ public class AudioController : MonoBehaviour {
 		Destroy(this);
 	}
 
-    void OnLevelWasLoaded(int level)
+    void OnLevelWasLoaded(int levelNumber)
     {
         updates = 0;
-        Debug.Log("Level " + Application.loadedLevelName + " was loaded");
+        Debug.Log("Level " + Application.loadedLevelName + " was loaded (number " + levelNumber + ")");
     }
 
     void Update()

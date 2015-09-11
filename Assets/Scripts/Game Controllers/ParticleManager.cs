@@ -6,8 +6,9 @@ public class ParticleManager : MonoBehaviour {
 
     public static ParticleManager instance;
 
-    public static List<ParticleController> particles;
-    public static Queue<KeyValuePair<ParticleController, ParticleController>> bondsToMake;
+    public static List<ParticleController> particles = new List<ParticleController>();
+    public static Queue<KeyValuePair<ParticleController, ParticleController>> bondsToMake
+        = new Queue<KeyValuePair<ParticleController, ParticleController>>();
 
     public static LayerMask layerMask;
 
@@ -27,26 +28,34 @@ public class ParticleManager : MonoBehaviour {
         if (instance == null)
         {
             instance = this;
-            particles = new List<ParticleController>();
-            GameObject[] go_particles = GameObject.FindGameObjectsWithTag("Particle");
+            //particles = new List<ParticleController>();
+            /*GameObject[] go_particles = GameObject.FindGameObjectsWithTag("Particle");
+            ParticleController particle;
             foreach (GameObject go_particle in go_particles)
             {
-                particles.Add(go_particle.GetComponent<ParticleController>());
-            }
-            bondsToMake = new Queue<KeyValuePair<ParticleController, ParticleController>>();
+                particle = go_particle.GetComponent<ParticleController>();
+                if (!particles.Contains(particle)) particles.Add(particle);
+            }*///This is now performed by each particle individually
+            //bondsToMake = new Queue<KeyValuePair<ParticleController, ParticleController>>();
 
             layerMask = LayerMask.GetMask("Particle");
 
             AudioSource[] sources = GetComponents<AudioSource>();
             audioSourceFlow = sources[0];
             audioSourceSplash = sources[1];
-            Debug.Log("Particle Manager initialised with " + particles.Count + " particles");
+            //Debug.Log("Particle Manager initialised with " + particles.Count + " particles");
         }
         else
         {
             Destroy(gameObject);
         }
 	}
+
+    void OnLevelWasLoaded(int levelNumber)
+    {
+        particles = new List<ParticleController>();
+        bondsToMake = new Queue<KeyValuePair<ParticleController, ParticleController>>();
+    }
 
     void Update()
     {
@@ -91,7 +100,8 @@ public class ParticleManager : MonoBehaviour {
         foreach (ParticleController particle in particles)
         {
             particle.LateFixedUpdate();//This gets funny if particles get deleted, because they get removed from the list
-            if (particle.temperature < ParticleBond.boilingTemperatures[particle.type])
+            if (particle.temperature < ParticleBond.boilingTemperatures[particle.type]
+                && particle.temperature > ParticleBond.meltingTemperatures[particle.type])
             {
                 velocitySquared = particle.rb.velocity.sqrMagnitude;
                 totalVelocitySquared += velocitySquared - 1.0f;
@@ -136,6 +146,15 @@ public class ParticleManager : MonoBehaviour {
             totalEnergy += particle.totalEnergy;
         }
 	}
+
+    public static void AddParticle(ParticleController particle)
+    {
+        if (!particles.Contains(particle))
+        {
+            particles.Add(particle);
+            //Debug.Log("Particle " + particle.name + " added to ParticleManager.particles (Count now equals " + particles.Count + ")");
+        }
+    }
 
     public static void QueueToConnect(ParticleController one, ParticleController two)
     {

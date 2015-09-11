@@ -8,7 +8,7 @@ public class LaserController : MonoBehaviour {
     ParticleSystem ps;
     //Transform pivot;
     AudioSource audioSource;
-    Dragable dragable;
+    public Dragable dragable;
 
     public BatteryController battery;
 
@@ -66,6 +66,8 @@ public class LaserController : MonoBehaviour {
             Destroy(transform.FindChild("Min Block Container").gameObject);
             Destroy(transform.FindChild("Max Block Container").gameObject);
         }
+        //Rotate the hand icon to start upright
+        transform.FindChild("Handle").FindChild("Hand").rotation = Quaternion.identity;
 
         if (battery != null) battery.SetTarget(transform.position);
 
@@ -88,10 +90,9 @@ public class LaserController : MonoBehaviour {
         {
             lr_aim.enabled = false;
             RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * 2.75f, transform.right, 500.0f);
-            if (hit.point != null)
+            if (hit.collider != null)
             {
                 hitPoint = hit.point;
-                lr_beam.SetPosition(1, hitPoint);
                 hitParticle = hit.collider.GetComponent<ParticleController>();
                 if (hitParticle != null)
                 {
@@ -102,6 +103,12 @@ public class LaserController : MonoBehaviour {
                 ps.enableEmission = true;
                 ps.emissionRate = 100.0f * relativePower * relativePower;
             }
+            else
+            {
+                hitPoint = transform.position + transform.right * 500.0f;
+                ps.enableEmission = false;
+            }
+            lr_beam.SetPosition(1, hitPoint);
         }
         else
         {
@@ -111,11 +118,15 @@ public class LaserController : MonoBehaviour {
             {
                 //Position aiming line
                 RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * 2.75f, transform.right, 500.0f);
-                if (hit.point != null)
+                if (hit.collider != null)
                 {
                     hitPoint = hit.point;
-                    lr_aim.SetPosition(1, hitPoint);
                 }
+                else
+                {
+                    hitPoint = transform.position + transform.right * 500.0f;
+                }
+                lr_aim.SetPosition(1, hitPoint);
                 lr_aim.enabled = true;
             }
             else

@@ -44,33 +44,38 @@ public class LevelController : MonoBehaviour {
 	void Update()
     {
         if (Input.GetKeyDown(KeyCode.R)) Application.LoadLevel(Application.loadedLevelName);
-        int lastNumberComplete = numberComplete;
-        numberComplete = 0;
-        numberToComplete = objectives.Count;
-	    foreach (LevelObjective objective in objectives)
+
+        if (!levelComplete)
         {
-            if (objective.GetIsComplete())
+            int lastNumberComplete = numberComplete;
+            numberComplete = 0;
+            numberToComplete = objectives.Count;
+            foreach (LevelObjective objective in objectives)
             {
-                numberComplete++;
+                if (objective.GetIsComplete())
+                {
+                    numberComplete++;
+                }
+            }
+            levelComplete = (numberComplete == numberToComplete);
+
+            //Play objective sound if an objective has been completed or uncompleted
+            if (lastNumberComplete < numberComplete)
+            {
+                objectiveAudioSource.timeSamples = 0;
+                objectiveAudioSource.pitch = 0.5f + numberComplete * 0.1f;
+                objectiveAudioSource.Play();
+            }
+            if (lastNumberComplete > numberComplete)
+            {
+                objectiveAudioSource.timeSamples = objectiveAudioSource.clip.samples - 1;
+                objectiveAudioSource.pitch = -0.5f - numberComplete * 0.1f;
+                objectiveAudioSource.Play();
             }
         }
-        levelComplete = (numberComplete == numberToComplete);
         if (objectives.Count == 0) levelComplete = false;
         if (!levelComplete) currentCompletionDelay = -completionDelay * 0.75f;
 
-        //Play objective sound if an objective has been completed or uncompleted
-        if (lastNumberComplete < numberComplete)
-        {
-            objectiveAudioSource.timeSamples = 0;
-            objectiveAudioSource.pitch = 0.5f + numberComplete * 0.1f;
-            objectiveAudioSource.Play();
-        }
-        if (lastNumberComplete > numberComplete)
-        {
-            objectiveAudioSource.timeSamples = objectiveAudioSource.clip.samples - 1;
-            objectiveAudioSource.pitch = -0.5f - numberComplete * 0.1f;
-            objectiveAudioSource.Play();
-        }
 
         if (levelComplete)
         {

@@ -4,18 +4,19 @@ using System.Collections.Generic;
 
 public class MetalParticleController : ParticleController {
 
+    public override int type { get { return 1; } }
+    public override float thermalTransferFactor { get { return 0.6f; } }
+    public override float velocityTransferFactor { get { return 0.2f; } }
+    public override float thermalStayFactor { get { return 0.4f; } }
+    public override float velocityStayFactor { get { return 0.8f; } }
+    public override float heatCapacity { get { return 3.0f; } }
+    public override float mass { get { return 3.0f; } }
+    public override float inverseMass { get { return 0.33333333f; } }
+    public override float massxHeatCapacity { get { return 9.0f; } }
+    public override float inverseMassxHeatCapacity { get { return 0.11111111f; } }
+
     public  float voltage = 0.0f;
     MetalParticleController otherMetal;//Is this better than dynamic allocation?
-
-	protected override void Start ()
-    {
-        type = 1;
-        thermalTransferFactor = 0.6f;
-        velocityTransferFactor = 0.2f;
-        heatCapacity = 3.0f;
-        mass = 3.0f;
-        base.Start();
-	}
 
     public override void EarlyFixedUpdate()
     {

@@ -20,9 +20,20 @@ public class LaserSwitchController : MonoBehaviour {
     void OnMouseUp()
     {
         laser.on = false;
+        laser.dragable.OnMouseUp();
+    }
+    public void OnMouseEnter()
+    {
+        laser.dragable.OnMouseEnter();
     }
     void OnMouseExit()
     {
-        laser.on = false;
+        //laser.on = false;
+        if (laser.on)
+        {
+            laser.dragable.OnMouseDown();
+            laser.dragable.SetJointAnchorForButton();
+        }
+        laser.dragable.OnMouseExit();
     }
 }

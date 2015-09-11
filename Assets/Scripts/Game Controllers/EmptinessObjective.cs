@@ -15,6 +15,8 @@ public class EmptinessObjective : LevelObjective {
 
     void OnDrawGizmos()
     {
+        bottomLeft = transform.TransformPoint(-0.5f, -0.5f, 0.0f);
+        topRight = transform.TransformPoint(0.5f, 0.5f, 0.0f);
         Gizmos.color = Color.cyan;
         Gizmos.DrawSphere(bottomLeft, 0.2f);
         Gizmos.DrawLine(bottomLeft, new Vector2(bottomLeft.x, topRight.y));

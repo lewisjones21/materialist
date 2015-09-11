@@ -34,7 +34,7 @@ public class Dragable : MonoBehaviour {
         }
 	}
 
-    void OnMouseDown()
+    public void OnMouseDown()
     {
         joint = gameObject.AddComponent<SpringJoint2D>();
         Vector2 mousePoint
@@ -49,7 +49,7 @@ public class Dragable : MonoBehaviour {
         CursorManager.SetHasGrabbed(true);
         held = true;
     }
-    void OnMouseUp()
+    public void OnMouseUp()
     {
         Destroy(joint);
         joint = null;
@@ -59,16 +59,26 @@ public class Dragable : MonoBehaviour {
         held = false;
     }
 
-    void OnMouseEnter()
+    public void OnMouseEnter()
     {
         CursorManager.SetCanGrab(true);
     }
-    void OnMouseExit()
+    public void OnMouseExit()
     {
         CursorManager.SetCanGrab(false);
         if (joint == null)
         {
             Cursor.SetCursor(null, new Vector2(95, 38), CursorMode.Auto);
+        }
+    }
+
+    public void SetJointAnchorForButton()
+    {
+        if (joint != null)
+        {
+            Vector2 oldAnchorPosition = joint.anchor;
+            joint.anchor = Vector2.right * 0.4f;
+            joint.distance = (oldAnchorPosition - joint.anchor).magnitude;
         }
     }
 }

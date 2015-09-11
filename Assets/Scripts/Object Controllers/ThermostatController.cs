@@ -90,10 +90,6 @@ public class ThermostatController : MonoBehaviour
         a = 4.0f / (minTemperature * maxTemperature - Mathf.Pow(minTemperature + maxTemperature, 2.0f));
         b = -a * (minTemperature + maxTemperature);
         c = a * minTemperature * maxTemperature;
-        Debug.Log(a * minTemperature * minTemperature + b * minTemperature + c);
-        Debug.Log(a * maxTemperature * maxTemperature + b * maxTemperature + c);
-        float midTemperature = (minTemperature + maxTemperature) * 0.5f;
-        Debug.Log(a * midTemperature * midTemperature + b * midTemperature + c);
     }
 
     void Update()

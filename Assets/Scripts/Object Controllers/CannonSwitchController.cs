@@ -21,9 +21,20 @@ public class CannonSwitchController : MonoBehaviour {
     void OnMouseUp()
     {
         cannon.shouldFire = false;
+        cannon.dragable.OnMouseUp();
+    }
+    public void OnMouseEnter()
+    {
+        cannon.dragable.OnMouseEnter();
     }
     void OnMouseExit()
     {
-        cannon.shouldFire = false;
+        //cannon.shouldFire = false;
+        if (cannon.shouldFire)
+        {
+            cannon.dragable.OnMouseDown();
+            cannon.dragable.SetJointAnchorForButton();
+        }
+        cannon.dragable.OnMouseExit();
     }
 }
