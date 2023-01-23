@@ -87,6 +87,7 @@ public class ParticleBond : MonoBehaviour {
         b.thermalEnergy += bondEnergies[typeB];
         joint = a.gameObject.AddComponent<DistanceJoint2D>();
         joint.connectedBody = b.rb;
+        joint.autoConfigureDistance = false;
         joint.distance = a.radius + b.radius;
         joint.enableCollision = true;
     }
