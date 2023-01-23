@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 
 public class MenuController : MonoBehaviour
 {
-
     public static string startScreenName = "Start Screen",
         manipulationSelectScreenName = "Manipulation Select Screen",
         destructionSelectScreenName = "Destruction Select Screen",
@@ -13,8 +11,6 @@ public class MenuController : MonoBehaviour
         aboutScreenName = "About Screen",
         quitScreenName = "Quit Screen",
         websiteText = "http://divf.eng.cam.ac.uk/gam2eng/Main/WebHome";
-
-    public AudioClip soundMouseEnter, soundMouseExit;
 
     public static bool inMenu;
 
@@ -112,21 +108,5 @@ public class MenuController : MonoBehaviour
     public void CopyWebsiteText()
     {
         //To be filled in at some point maybe?
-    }
-
-    public void MouseEnter()
-    {
-        if (soundMouseEnter != null)
-        {
-            AudioSource.PlayClipAtPoint(soundMouseEnter, transform.position, 0.2f);
-        }
-        return;
-    }
-    public void MouseExit()
-    {
-        if (soundMouseExit != null)
-        {
-            AudioSource.PlayClipAtPoint(soundMouseExit, transform.position, 0.2f);
-        }
     }
 }
