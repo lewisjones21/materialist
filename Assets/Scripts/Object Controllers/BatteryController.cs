@@ -14,7 +14,7 @@ public class BatteryController : MonoBehaviour {
 	void Start()
     {
         lr = GetComponent<LineRenderer>();
-        energyMeter = transform.FindChild("Energy Meter");
+        energyMeter = transform.Find("Energy Meter");
         lr.SetPosition(0, transform.position);
         lr.SetPosition(1, transform.position);
         lr.sortingLayerName = "Battery";

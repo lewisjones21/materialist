@@ -22,9 +22,9 @@ public class LaserController : MonoBehaviour {
 	void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        lr_aim = transform.FindChild("Handle").GetComponent<LineRenderer>();
-        lr_beam = transform.FindChild("Beam").GetComponent<LineRenderer>();
-        ps = lr_beam.transform.FindChild("End Effect").GetComponent<ParticleSystem>();
+        lr_aim = transform.Find("Handle").GetComponent<LineRenderer>();
+        lr_beam = transform.Find("Beam").GetComponent<LineRenderer>();
+        ps = lr_beam.transform.Find("End Effect").GetComponent<ParticleSystem>();
         //pivot = transform.FindChild("Pivot");
         audioSource = GetComponent<AudioSource>();
         dragable = GetComponent<Dragable>();
@@ -51,11 +51,11 @@ public class LaserController : MonoBehaviour {
         if (maxAngle - minAngle <= 120.0f)//If they wouldn't look untangible
         {
             //Rotate the blocks and unparent them to prevent further rotation
-            Transform blockContainer = transform.FindChild("Min Block Container");
+            Transform blockContainer = transform.Find("Min Block Container");
             blockContainer.localRotation = Quaternion.AngleAxis(-minAngle, Vector3.forward);
             blockContainer.GetChild(0).SetParent(transform.parent);
             Destroy(blockContainer.gameObject);
-            blockContainer = transform.FindChild("Max Block Container");
+            blockContainer = transform.Find("Max Block Container");
             blockContainer.localRotation = Quaternion.AngleAxis(-maxAngle, Vector3.forward);
             blockContainer.GetChild(0).SetParent(transform.parent);
             Destroy(blockContainer.gameObject);
@@ -63,11 +63,11 @@ public class LaserController : MonoBehaviour {
         else
         {
             //Destroy the blocks
-            Destroy(transform.FindChild("Min Block Container").gameObject);
-            Destroy(transform.FindChild("Max Block Container").gameObject);
+            Destroy(transform.Find("Min Block Container").gameObject);
+            Destroy(transform.Find("Max Block Container").gameObject);
         }
         //Rotate the hand icon to start upright
-        transform.FindChild("Handle").FindChild("Hand").rotation = Quaternion.identity;
+        transform.Find("Handle").Find("Hand").rotation = Quaternion.identity;
 
         if (battery != null) battery.SetTarget(transform.position);
 

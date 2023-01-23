@@ -17,7 +17,7 @@ public class ElectrodeController : MonoBehaviour {
 
 	void Start()
     {
-        srAura = transform.FindChild("Aura").GetComponent<SpriteRenderer>();
+        srAura = transform.Find("Aura").GetComponent<SpriteRenderer>();
         colorAuraBase = srAura.color;
         if (isPositive)
         {

@@ -21,7 +21,7 @@ public class ThermometerController : MonoBehaviour {
 	void Start()
     {
         lr = GetComponent<LineRenderer>();
-        LineRenderer lrChild = transform.FindChild("Check Position").GetComponent<LineRenderer>();
+        LineRenderer lrChild = transform.Find("Check Position").GetComponent<LineRenderer>();
         lrChild.SetPosition(0, -lrChild.transform.localPosition + Vector3.down * 2.25f);
         lrChild.sortingLayerName = "Door";
         lrChild.sortingOrder = 1;
@@ -49,36 +49,36 @@ public class ThermometerController : MonoBehaviour {
 
         if (hasWater)
         {
-            transform.FindChild("Water Marker").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
+            transform.Find("Water Marker").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
                 GetRelativeTemperature(ParticleBond.meltingTemperatures[0]));
-            transform.FindChild("Water Marker 2").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
+            transform.Find("Water Marker 2").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
                 GetRelativeTemperature(ParticleBond.boilingTemperatures[0]));
         }
         else
         {
-            transform.FindChild("Water Marker").gameObject.SetActive(false);
-            transform.FindChild("Water Marker 2").gameObject.SetActive(false);
+            transform.Find("Water Marker").gameObject.SetActive(false);
+            transform.Find("Water Marker 2").gameObject.SetActive(false);
         }
         if (hasMetal)
         {
-            transform.FindChild("Metal Marker").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
+            transform.Find("Metal Marker").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
                 GetRelativeTemperature(ParticleBond.meltingTemperatures[1]));
-            transform.FindChild("Metal Marker 2").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
+            transform.Find("Metal Marker 2").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
                 GetRelativeTemperature(ParticleBond.boilingTemperatures[1]));
         }
         else
         {
-            transform.FindChild("Metal Marker").gameObject.SetActive(false);
-            transform.FindChild("Metal Marker 2").gameObject.SetActive(false);
+            transform.Find("Metal Marker").gameObject.SetActive(false);
+            transform.Find("Metal Marker 2").gameObject.SetActive(false);
         }
         if (hasCeramic)
         {
-            transform.FindChild("Ceramic Marker").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
+            transform.Find("Ceramic Marker").localPosition += Vector3.Lerp(Vector3.down * 2.25f, Vector3.up * 2.25f,
                 GetRelativeTemperature(ParticleBond.meltingTemperatures[2]));
         }
         else
         {
-            transform.FindChild("Ceramic Marker").gameObject.SetActive(false);
+            transform.Find("Ceramic Marker").gameObject.SetActive(false);
         }
 	}
 	

@@ -19,7 +19,7 @@ public class DoorController : MonoBehaviour {
         GetComponent<SliderJoint2D>().enabled = true;
         GetComponent<SliderJoint2D>().connectedAnchor = transform.position;
 
-        transform.FindChild("Slot").SetParent(transform.parent);
+        transform.Find("Slot").SetParent(transform.parent);
 	}
 
     void Update()

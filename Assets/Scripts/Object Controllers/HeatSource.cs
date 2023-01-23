@@ -29,7 +29,7 @@ public class HeatSource : MonoBehaviour {
     {
         Color tempColour = ThermometerController.GetColor(temperature);
         GetComponent<SpriteRenderer>().color = tempColour;
-        transform.FindChild("Aura").GetComponent<SpriteRenderer>().color = new Color(tempColour.r, tempColour.g, tempColour.b, 0.2f);
+        transform.Find("Aura").GetComponent<SpriteRenderer>().color = new Color(tempColour.r, tempColour.g, tempColour.b, 0.2f);
         //GetComponent<Halo>().color = new Color(tempColour.r, tempColour.g, tempColour.b, 0.2f);
     }
 }
