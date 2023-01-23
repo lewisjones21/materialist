@@ -56,6 +56,11 @@ public class Dragable : MonoBehaviour {
         joint = null;
         lr.enabled = false;
         rb.isKinematic = fixOnRelease;
+        if (rb.isKinematic)
+        {
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
         CursorManager.SetHasGrabbed(false);
         held = false;
     }
