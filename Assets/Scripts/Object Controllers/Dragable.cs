@@ -40,6 +40,7 @@ public class Dragable : MonoBehaviour {
         Vector2 mousePoint
             = Camera.main.ScreenToWorldPoint(Input.mousePosition + Vector3.forward * Camera.main.transform.position.z);
         joint.anchor = transform.InverseTransformPoint(mousePoint);
+        joint.autoConfigureDistance = false;
         joint.distance = 0.005f;
         joint.frequency = 0.5f;
         joint.dampingRatio = 1;
