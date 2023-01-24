@@ -6,7 +6,11 @@ public class AudioController : MonoBehaviour {
 	static AudioController instance;
 
     public float menuVolume = 0.5f, gameVolume = 0.3f;
+#if !UNITY_WEBGL
     public float menuPitch = -0.8f, gamePitch = 1.0f, quitPitch = -0.5f;
+#else
+    public float menuPitch = 0.4f, gamePitch = 1.0f, quitPitch = 0.1f;
+#endif
 
     private AudioSource audioSourceMusic, audioSourceEvaporate, audioSourceSolidify;
     public float fadeFactor = 0.02f, sfxFadeFactor = 0.35f;
