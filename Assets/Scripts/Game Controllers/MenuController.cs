@@ -23,7 +23,7 @@ public class MenuController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             if (SceneManager.GetActiveScene().name == startMenuName)
             {
