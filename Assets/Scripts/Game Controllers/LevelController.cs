@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using UnityEngine.SceneManagement;
 
 public class LevelController : MonoBehaviour {
 
@@ -19,7 +19,7 @@ public class LevelController : MonoBehaviour {
 
 	void Start()
     {
-        if (Application.loadedLevelName.Contains("Screen"))
+        if (SceneManager.GetActiveScene().name.Contains("Screen"))
         {
             Destroy(gameObject);
             return;
@@ -43,7 +43,10 @@ public class LevelController : MonoBehaviour {
 	
 	void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R)) Application.LoadLevel(Application.loadedLevelName);
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
 
         if (!levelComplete)
         {
@@ -104,7 +107,7 @@ public class LevelController : MonoBehaviour {
 
     void GoToNextLevel()
     {
-        string currentLevelName = Application.loadedLevelName;
+        string currentLevelName = SceneManager.GetActiveScene().name;
         int currentLevelNumber = 0;
         //Parse number from name after removing letters:
         int.TryParse(Regex.Replace(currentLevelName, "[^0-9]", ""), out currentLevelNumber);

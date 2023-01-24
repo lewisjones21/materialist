@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class CursorManager : MonoBehaviour
 {
@@ -16,19 +15,19 @@ public class CursorManager : MonoBehaviour
     {
         if (instance == null)
         {
-            //Debug.Log("Assigning instance of Audio Controller");
             instance = this;
+
+            transform.SetParent(null);
+            DontDestroyOnLoad(this);
         }
         else
         {
             Destroy(gameObject);
         }
-        DontDestroyOnLoad(this);
     }
 
     public void OnApplicationQuit()
     {
-        //Debug.Log("Audio Controller destroyed");
         instance = null;
         Destroy(this);
     }

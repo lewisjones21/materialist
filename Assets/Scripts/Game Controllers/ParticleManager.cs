@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class ParticleManager : MonoBehaviour {
 
@@ -20,7 +21,7 @@ public class ParticleManager : MonoBehaviour {
 
 	void Start()
     {
-        if (Application.loadedLevelName.Contains("Screen"))
+        if (SceneManager.GetActiveScene().name.Contains("Screen"))
         {
             Destroy(gameObject);
             return;
@@ -44,6 +45,8 @@ public class ParticleManager : MonoBehaviour {
             audioSourceFlow = sources[0];
             audioSourceSplash = sources[1];
             //Debug.Log("Particle Manager initialised with " + particles.Count + " particles");
+
+            SceneManager.sceneLoaded += HandleSceneLoaded;
         }
         else
         {
@@ -51,7 +54,7 @@ public class ParticleManager : MonoBehaviour {
         }
 	}
 
-    void OnLevelWasLoaded(int levelNumber)
+    void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         particles = new List<ParticleController>();
         bondsToMake = new Queue<KeyValuePair<ParticleController, ParticleController>>();

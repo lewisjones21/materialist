@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class AudioController : MonoBehaviour {
 
@@ -23,46 +23,45 @@ public class AudioController : MonoBehaviour {
 
 	void Awake()
     {
-        //Debug.Log(instance);
         if (instance != null)
         {
             Destroy(gameObject);
         }
         else
         {
-            Debug.Log("Assigning instance of Audio Controller");
             instance = this;
-            transform.SetParent(null);
+
             AudioSource[] sources = GetComponents<AudioSource>();
             audioSourceMusic = sources[0];
             audioSourceEvaporate = sources[1];
             audioSourceSolidify = sources[2];
             stayFactor = 1 - fadeFactor;
             sfxStayFactor = 1 - sfxFadeFactor;
+
+            SceneManager.sceneLoaded += HandleSceneLoaded;
+
+            transform.SetParent(null);
             DontDestroyOnLoad(this);
         }
 	}
 	
 	public void OnApplicationQuit()
 	{
-		//Debug.Log("Audio Controller destroyed");
 		instance = null;
 		Destroy(this);
 	}
 
-    void OnLevelWasLoaded(int levelNumber)
+    void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         updates = 0;
-        Debug.Log("Level " + Application.loadedLevelName + " was loaded (number " + levelNumber + ")");
     }
 
     void Update()
     {
-
         if (MenuController.inMenu)
         {
             audioSourceMusic.volume = audioSourceMusic.volume * stayFactor + menuVolume * fadeFactor;
-            if (!Application.loadedLevelName.Contains("Quit"))
+            if (!SceneManager.GetActiveScene().name.Contains("Quit"))
             {
                 audioSourceMusic.pitch = audioSourceMusic.pitch * stayFactor + menuPitch * fadeFactor;
             }

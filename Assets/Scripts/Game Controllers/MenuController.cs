@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MenuController : MonoBehaviour
@@ -17,32 +18,32 @@ public class MenuController : MonoBehaviour
     void Start()
     {
         Cursor.visible = true;
-        inMenu = (Application.loadedLevelName.Contains("Screen"));
+        inMenu = SceneManager.GetActiveScene().name.Contains("Screen");
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (Application.loadedLevelName == startScreenName)
+            if (SceneManager.GetActiveScene().name == startScreenName)
             {
                 GoToQuitScreen();
             }
-            else if (Application.loadedLevelName.Contains("Screen"))
+            else if (SceneManager.GetActiveScene().name.Contains("Screen"))
             {
                 GoToStartScreen();
             }
             else
             {
-                if (Application.loadedLevelName.Contains("Manip"))//Manipulation
+                if (SceneManager.GetActiveScene().name.Contains("Manip"))//Manipulation
                 {
                     GoToManipulationSelectScreen();
                 }
-                else if (Application.loadedLevelName.Contains("Destr"))//Destruction
+                else if (SceneManager.GetActiveScene().name.Contains("Destr"))//Destruction
                 {
                     GoToDestructionSelectScreen();
                 }
-                else if (Application.loadedLevelName.Contains("Const"))//Construction
+                else if (SceneManager.GetActiveScene().name.Contains("Const"))//Construction
                 {
                     GoToConstructionSelectScreen();
                 }
@@ -58,12 +59,12 @@ public class MenuController : MonoBehaviour
     {
         if (Application.CanStreamedLevelBeLoaded(levelName))
         {
-            inMenu = (levelName.Contains("Screen"));
-            Application.LoadLevel(levelName);
+            inMenu = levelName.Contains("Screen");
+            SceneManager.LoadScene(levelName);
         }
         else
         {
-            Debug.LogWarning("Attempted to load non-existant level: " + levelName + " (it may need to be added to the build settings)");
+            Debug.LogWarning("Attempted to load non-existent level: " + levelName + " (it may need to be added to the build settings)");
         }
     }
 
