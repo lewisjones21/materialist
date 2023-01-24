@@ -59,6 +59,12 @@ public class MenuController : MonoBehaviour
     {
         if (Application.CanStreamedLevelBeLoaded(levelName))
         {
+            // Disable all button sounds
+            foreach (ButtonController buttonContoller in FindObjectsOfType<ButtonController>())
+            {
+                buttonContoller.enabled = false;
+            }
+
             inMenu = levelName.Contains("Menu");
             SceneManager.LoadScene(levelName);
         }

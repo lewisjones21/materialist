@@ -9,7 +9,7 @@ public class ButtonController : MonoBehaviour
 
     public void OnPointerEnter()
     {
-        if (_soundMouseEnter != null)
+        if (enabled && _soundMouseEnter != null)
         {
             AudioSource.PlayClipAtPoint(_soundMouseEnter, Vector3.zero, 1f);
         }
@@ -17,7 +17,7 @@ public class ButtonController : MonoBehaviour
 
     public void OnPointerExit()
     {
-        if (_soundMouseExit != null)
+        if (enabled && _soundMouseExit != null)
         {
             AudioSource.PlayClipAtPoint(_soundMouseExit, Vector3.zero, 1f);
         }
