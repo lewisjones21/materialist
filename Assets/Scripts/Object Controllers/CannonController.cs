@@ -1,12 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public class CannonController : MonoBehaviour {
-
-    Rigidbody2D rb;
+public class CannonController : MonoBehaviour
+{
     LineRenderer lr_aim;
-    //ParticleSystem ps;
-    AudioSource audioSource;
     public Dragable dragable;
 
     public GameObject particle;
@@ -15,22 +11,15 @@ public class CannonController : MonoBehaviour {
     public bool automatic = false, shouldFire = false;
     public float minAngle = -60.0f, maxAngle = 60.0f;
 
-    float timeOutPeriod = 0.5f, currentTimeOut = 0.0f;
-
     Vector2 hitPoint;
 
 	void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
         lr_aim = transform.Find("Handle").GetComponent<LineRenderer>();
-        //ps = lr_beam.transform.FindChild("End Effect").GetComponent<ParticleSystem>();
-        //pivot = transform.FindChild("Pivot");
-        audioSource = GetComponent<AudioSource>();
         dragable = GetComponent<Dragable>();
         lr_aim.SetPosition(0, transform.position);
         lr_aim.sortingLayerName = "Cannon";
         lr_aim.sortingOrder = 0;
-        //ps.enableEmission = false;
 
         HingeJoint2D hinge = GetComponent<HingeJoint2D>();
         hinge.connectedAnchor = transform.TransformPoint(GetComponent<HingeJoint2D>().anchor);
@@ -68,8 +57,6 @@ public class CannonController : MonoBehaviour {
         //Change the symbol letter
         transform.Find("Symbol").GetComponent<TextMesh>().text = (particleType == 2 ? "C" : (particleType == 1 ? "M" : "W"));
         transform.Find("Symbol").rotation = Quaternion.identity;
-
-        timeOutPeriod = 0.5f / speed;//Enough time for the previous particle to get clear
 	}
 	
 	void Update()
@@ -94,15 +81,6 @@ public class CannonController : MonoBehaviour {
             lr_aim.enabled = false;
         }
 
-        /*if (currentTimeOut > 0.0f)
-        {
-            currentTimeOut -= Time.deltaTime;
-        }
-        else
-        {
-            currentTimeOut = 0.0f;
-            if (automatic && shouldFire) Fire();
-        }*/
         if (automatic && shouldFire) Fire();
 	}
 
@@ -116,20 +94,17 @@ public class CannonController : MonoBehaviour {
     public void Fire()
     {
         Vector2 position = transform.position + transform.right;
-        if (/*currentTimeOut == 0.0f && */Physics2D.OverlapCircle(position, 0.5f, ParticleManager.layerMask) == null)
+        if (Physics2D.OverlapCircle(position, 0.5f, ParticleManager.layerMask) == null)
         {
-            GameObject newParticle = (GameObject)Instantiate(particle, position, Quaternion.identity);
-            //currentParticle = newParticle.GetComponent<ParticleController>();
+            GameObject newParticle = Instantiate(particle, position, Quaternion.identity);
             Vector2 velocity = speed * transform.right;
             Rigidbody2D rb_particle = newParticle.GetComponent<Rigidbody2D>();
             rb_particle.velocity = velocity;
             ParticleController particleController = newParticle.GetComponent<ParticleController>();
-            //particleController.Add();
             particleController.SetTemperature(temperature, true);
             //Set energy-related variables so that the temperature doesn't get reduced again when attempting to conserve energy
             particleController.lastVelocitySquared = Vector2.Dot(velocity, velocity);
             particleController.kineticEnergy = 0.5f * rb_particle.mass * particleController.lastVelocitySquared;
-            //currentTimeOut = timeOutPeriod;
             shouldFire = automatic && shouldFire;
         }
     }
