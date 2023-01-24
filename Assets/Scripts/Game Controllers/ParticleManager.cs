@@ -21,7 +21,7 @@ public class ParticleManager : MonoBehaviour {
 
 	void Start()
     {
-        if (SceneManager.GetActiveScene().name.Contains("Screen"))
+        if (SceneManager.GetActiveScene().name.Contains("Menu"))
         {
             Destroy(gameObject);
             return;

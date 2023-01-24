@@ -19,7 +19,7 @@ public class LevelController : MonoBehaviour {
 
 	void Start()
     {
-        if (SceneManager.GetActiveScene().name.Contains("Screen"))
+        if (SceneManager.GetActiveScene().name.Contains("Menu"))
         {
             Destroy(gameObject);
             return;
@@ -116,7 +116,7 @@ public class LevelController : MonoBehaviour {
         currentLevelName = currentLevelTypeName + currentLevelNumber.ToString();//Combine type name and incremented number
         if (!Application.CanStreamedLevelBeLoaded(currentLevelName))//If the next numbered level doesn't exist
         {
-            currentLevelName = currentLevelTypeName + "Select Screen";//Go back to the selection screen
+            currentLevelName = currentLevelTypeName + "Select Menu";//Go back to the selection menu
         }
         MenuController.LoadLevel(currentLevelName);//Recombine name and incremented number
     }

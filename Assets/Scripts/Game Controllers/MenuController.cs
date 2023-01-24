@@ -4,13 +4,13 @@ using UnityEngine.UI;
 
 public class MenuController : MonoBehaviour
 {
-    public static string startScreenName = "Start Screen",
-        manipulationSelectScreenName = "Manipulation Select Screen",
-        destructionSelectScreenName = "Destruction Select Screen",
-        constructionSelectScreenName = "Construction Select Screen",
-        helpScreenName = "Help Screen",
-        aboutScreenName = "About Screen",
-        quitScreenName = "Quit Screen",
+    public static string startMenuName = "Start Menu",
+        manipulationSelectMenuName = "Manipulation Select Menu",
+        destructionSelectMenuName = "Destruction Select Menu",
+        constructionSelectMenuName = "Construction Select Menu",
+        helpMenuName = "Help Menu",
+        aboutMenuName = "About Menu",
+        quitMenuName = "Quit Menu",
         websiteText = "http://divf.eng.cam.ac.uk/gam2eng/Main/WebHome";
 
     public static bool inMenu;
@@ -18,38 +18,38 @@ public class MenuController : MonoBehaviour
     void Start()
     {
         Cursor.visible = true;
-        inMenu = SceneManager.GetActiveScene().name.Contains("Screen");
+        inMenu = SceneManager.GetActiveScene().name.Contains("Menu");
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (SceneManager.GetActiveScene().name == startScreenName)
+            if (SceneManager.GetActiveScene().name == startMenuName)
             {
-                GoToQuitScreen();
+                GoToQuitMenu();
             }
-            else if (SceneManager.GetActiveScene().name.Contains("Screen"))
+            else if (SceneManager.GetActiveScene().name.Contains("Menu"))
             {
-                GoToStartScreen();
+                GoToStartMenu();
             }
             else
             {
                 if (SceneManager.GetActiveScene().name.Contains("Manip"))//Manipulation
                 {
-                    GoToManipulationSelectScreen();
+                    GoToManipulationSelectMenu();
                 }
                 else if (SceneManager.GetActiveScene().name.Contains("Destr"))//Destruction
                 {
-                    GoToDestructionSelectScreen();
+                    GoToDestructionSelectMenu();
                 }
                 else if (SceneManager.GetActiveScene().name.Contains("Const"))//Construction
                 {
-                    GoToConstructionSelectScreen();
+                    GoToConstructionSelectMenu();
                 }
                 else
                 {
-                    GoToStartScreen();
+                    GoToStartMenu();
                 }
             }
         }
@@ -59,7 +59,7 @@ public class MenuController : MonoBehaviour
     {
         if (Application.CanStreamedLevelBeLoaded(levelName))
         {
-            inMenu = levelName.Contains("Screen");
+            inMenu = levelName.Contains("Menu");
             SceneManager.LoadScene(levelName);
         }
         else
@@ -68,33 +68,33 @@ public class MenuController : MonoBehaviour
         }
     }
 
-    public void GoToStartScreen()
+    public void GoToStartMenu()
     {
-        LoadLevel(startScreenName);
+        LoadLevel(startMenuName);
     }
-    public void GoToManipulationSelectScreen()
+    public void GoToManipulationSelectMenu()
     {
-        LoadLevel(manipulationSelectScreenName);
+        LoadLevel(manipulationSelectMenuName);
     }
-    public void GoToDestructionSelectScreen()
+    public void GoToDestructionSelectMenu()
     {
-        LoadLevel(destructionSelectScreenName);
+        LoadLevel(destructionSelectMenuName);
     }
-    public void GoToConstructionSelectScreen()
+    public void GoToConstructionSelectMenu()
     {
-        LoadLevel(constructionSelectScreenName);
+        LoadLevel(constructionSelectMenuName);
     }
-    public void GoToHelpScreen()
+    public void GoToHelpMenu()
     {
-        LoadLevel(helpScreenName);
+        LoadLevel(helpMenuName);
     }
-    public void GoToAboutScreen()
+    public void GoToAboutMenu()
     {
-        LoadLevel(aboutScreenName);
+        LoadLevel(aboutMenuName);
     }
-    public void GoToQuitScreen()
+    public void GoToQuitMenu()
     {
-        LoadLevel(quitScreenName);
+        LoadLevel(quitMenuName);
     }
     public void QuitGame()
     {
