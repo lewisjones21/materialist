@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
-using System.Collections;
+using static UnityEngine.ParticleSystem;
 
 public class LaserController : MonoBehaviour {
 
     Rigidbody2D rb;
     LineRenderer lr_aim, lr_beam;
     ParticleSystem ps;
+    EmissionModule emission;
     //Transform pivot;
     AudioSource audioSource;
     public Dragable dragable;
@@ -25,6 +26,7 @@ public class LaserController : MonoBehaviour {
         lr_aim = transform.Find("Handle").GetComponent<LineRenderer>();
         lr_beam = transform.Find("Beam").GetComponent<LineRenderer>();
         ps = lr_beam.transform.Find("End Effect").GetComponent<ParticleSystem>();
+        emission = ps.emission;
         //pivot = transform.FindChild("Pivot");
         audioSource = GetComponent<AudioSource>();
         dragable = GetComponent<Dragable>();
@@ -33,7 +35,7 @@ public class LaserController : MonoBehaviour {
         lr_aim.sortingOrder = 0;
         lr_beam.sortingLayerName = "Laser";
         lr_beam.sortingOrder = 0;
-        ps.enableEmission = false;
+        emission.enabled = false;
 
         HingeJoint2D hinge = GetComponent<HingeJoint2D>();
         hinge.connectedAnchor = transform.TransformPoint(GetComponent<HingeJoint2D>().anchor);
@@ -70,8 +72,7 @@ public class LaserController : MonoBehaviour {
         transform.Find("Handle").Find("Hand").rotation = Quaternion.identity;
 
         if (battery != null) battery.SetTarget(transform.position);
-
-	}
+    }
 	
 	void Update()
     {
@@ -100,20 +101,20 @@ public class LaserController : MonoBehaviour {
                 }
                 ps.transform.position = hitPoint;
                 //ps.transform.rotation = Quaternion.LookRotation(hit.normal);
-                ps.enableEmission = true;
-                ps.emissionRate = 100.0f * relativePower * relativePower;
+                emission.enabled = true;
+                emission.rateOverTime = 100.0f * relativePower * relativePower;
             }
             else
             {
                 hitPoint = transform.position + transform.right * 500.0f;
-                ps.enableEmission = false;
+                emission.enabled = true;
             }
             lr_beam.SetPosition(1, hitPoint);
         }
         else
         {
             lr_beam.SetPosition(1, rb.position);
-            ps.enableEmission = false;
+            emission.enabled = false;
             if (dragable.held)
             {
                 //Position aiming line
@@ -134,7 +135,8 @@ public class LaserController : MonoBehaviour {
                 lr_aim.enabled = false;
             }
         }
-        lr_beam.SetWidth(0.15f * relativePower, 0.15f * relativePower);
+        lr_beam.startWidth = 0.15f * relativePower;
+        lr_beam.endWidth = lr_beam.startWidth;
         audioSource.pitch = relativePower;
         audioSource.volume = 0.2f * relativePower;
         if (audioSource.volume > 0.01f && !audioSource.isPlaying) audioSource.Play();
